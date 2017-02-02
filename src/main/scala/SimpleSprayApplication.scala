@@ -33,10 +33,9 @@ object SimpleSprayApplication extends App with SimpleRoutingApp with KamonTraceD
               }
               someCounter.increment()
               top10Counter.get(uuid) match {
-                case None => {
+                case None =>
                   top10Counter.put(uuid, Kamon.metrics.counter(s"movies.top10.$uuid"))
-                  top10Counter.get(uuid).get.increment()
-                }
+                  top10Counter(uuid).increment()
                 case Some(v) => v.increment()
               }
 
