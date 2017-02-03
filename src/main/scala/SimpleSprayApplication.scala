@@ -3,6 +3,7 @@ import akka.pattern.after
 import kamon.spray.KamonTraceDirectives
 import spray.routing.SimpleRoutingApp
 
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -10,6 +11,8 @@ import scala.language.postfixOps
 object SimpleSprayApplication extends App with SimpleRoutingApp with KamonTraceDirectives {
   MetricsUtils.startReport()
   implicit val system = ActorSystem("simple-spray-application")
+
+  val movies = Map("123" -> Movie("123", "Independence Day"), "321" -> Movie("321", "Garfield"))
 
   import system.dispatcher
 
@@ -19,6 +22,7 @@ object SimpleSprayApplication extends App with SimpleRoutingApp with KamonTraceD
         uuid =>
           complete {
             MetricsUtils incrementEndpoint "resourceA"
+            MetricsUtils incrementTopHitsMovies movies(uuid)
             println(s"Processed $uuid")
 
             after(5 milliseconds, system.scheduler)(Future.successful("ok"))
@@ -33,4 +37,6 @@ object SimpleSprayApplication extends App with SimpleRoutingApp with KamonTraceD
         }
       }
   } onComplete { _ => "Test" }
+
+  case class Movie(uuid: String, name: String)
 }

@@ -15,6 +15,7 @@ public class MetricsUtils {
     private static final MetricRegistry metrics = new MetricRegistry();
 
     private static Map<String, Counter> endpoints = new HashMap<>();
+    private static Map<String, Counter> topHitsMovies = new HashMap<>();
 
     static void startReport() {
         ConsoleReporter consoleReporter = ConsoleReporter.forRegistry(metrics)
@@ -39,6 +40,11 @@ public class MetricsUtils {
 
     static void incrementEndpoint(String endpoint) {
         Counter orDefault = endpoints.getOrDefault(endpoint, metrics.counter("endpoint." + endpoint));
+        orDefault.inc();
+    }
+
+    static void incrementTopHitsMovies(SimpleSprayApplication.Movie movie) {
+        Counter orDefault = topHitsMovies.getOrDefault(movie.uuid(), metrics.counter("topHitMovies." + movie.name()));
         orDefault.inc();
     }
 
